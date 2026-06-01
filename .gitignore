@@ -1,0 +1,13 @@
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Docker
+docker-data/
+*.log
+
+# Editor
+.vscode/
+.idea/

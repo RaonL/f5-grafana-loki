@@ -1,0 +1,17 @@
+# =============================================================================
+# Grafana Dashboard Provisioning
+# =============================================================================
+# docker-compose 실행 시 f5_awaf_dashboard.json이 자동 임포트됩니다.
+# =============================================================================
+
+apiVersion: 1
+
+providers:
+  - name: "F5 AWAF"
+    orgId: 1
+    folder: "F5 AWAF"
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    options:
+      path: /etc/grafana/provisioning/dashboards
