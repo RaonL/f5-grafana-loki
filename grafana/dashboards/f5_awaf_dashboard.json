@@ -1,19 +1,30 @@
 {
-  "title": "F5 AWAF - 실시간 WAF 모니터링",
+  "title": "F5 AWAF - Real-time WAF Monitoring",
   "uid": "f5-awaf-dashboard",
-  "version": 1,
+  "version": 2,
   "timezone": "Asia/Seoul",
-  "tags": ["F5", "AWAF", "WAF", "Security"],
+  "tags": ["F5", "AWAF", "WAF", "Security", "Loki"],
   "schemaVersion": 39,
+  "refresh": "30s",
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": ["10s", "30s", "1m", "5m", "15m", "30m"],
+    "time_options": ["5m", "15m", "1h", "6h", "24h", "7d", "30d"]
+  },
   "panels": [
     {
-      "title": "🛡️ 총 탐지 건수 (24시간)",
+      "title": "Total WAF Events (24h)",
       "type": "stat",
       "gridPos": {"x": 0, "y": 0, "w": 3, "h": 3},
-      "targets": [{
-        "expr": "sum(count_over_time({job=~\"f5_asm_syslog.*\"}[24h]))",
-        "legendFormat": "전체 탐지"
-      }],
+      "targets": [
+        {
+          "expr": "sum(count_over_time({job=~\"f5_asm_syslog.*\"}[24h]))",
+          "legendFormat": "events"
+        }
+      ],
       "options": {
         "colorMode": "background",
         "graphMode": "area",
@@ -24,6 +35,7 @@
       },
       "fieldConfig": {
         "defaults": {
+          "unit": "short",
           "color": {"mode": "thresholds"},
           "thresholds": {
             "steps": [
@@ -36,22 +48,26 @@
       }
     },
     {
-      "title": "🚫 차단 건수 (24시간)",
+      "title": "Blocked Events (24h)",
       "type": "stat",
       "gridPos": {"x": 3, "y": 0, "w": 3, "h": 3},
-      "targets": [{
-        "expr": "sum(count_over_time({job=~\"f5_asm_syslog.*\"} |~ \"request_status=blocked\"[24h]))",
-        "legendFormat": "차단"
-      }],
+      "targets": [
+        {
+          "expr": "sum(count_over_time({job=~\"f5_asm_syslog.*\",request_status=\"blocked\"}[24h]))",
+          "legendFormat": "blocked"
+        }
+      ],
       "options": {
         "colorMode": "background",
         "graphMode": "area",
         "justifyMode": "center",
+        "orientation": "auto",
         "reduceOptions": {"calcs": ["lastNotNull"]},
         "textMode": "auto"
       },
       "fieldConfig": {
         "defaults": {
+          "unit": "short",
           "color": {"mode": "thresholds"},
           "thresholds": {
             "steps": [
@@ -64,17 +80,22 @@
       }
     },
     {
-      "title": "⚠️ 탐지율 (차단/전체)",
+      "title": "Block Rate (24h)",
       "type": "stat",
       "gridPos": {"x": 6, "y": 0, "w": 3, "h": 3},
-      "targets": [{
-        "expr": "sum(count_over_time({job=~\"f5_asm_syslog.*\"} |~ \"request_status=blocked\"[24h])) / sum(count_over_time({job=~\"f5_asm_syslog.*\"}[24h])) * 100",
-        "legendFormat": "차단율"
-      }],
+      "targets": [
+        {
+          "expr": "100 * sum(count_over_time({job=~\"f5_asm_syslog.*\",request_status=\"blocked\"}[24h])) / clamp_min(sum(count_over_time({job=~\"f5_asm_syslog.*\"}[24h])), 1)",
+          "legendFormat": "block rate"
+        }
+      ],
       "options": {
         "colorMode": "background",
         "graphMode": "none",
-        "reduceOptions": {"calcs": ["lastNotNull"]}
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {"calcs": ["lastNotNull"]},
+        "textMode": "auto"
       },
       "fieldConfig": {
         "defaults": {
@@ -82,44 +103,62 @@
           "color": {"mode": "thresholds"},
           "thresholds": {
             "steps": [
-              {"color": "red", "value": null},
+              {"color": "green", "value": null},
               {"color": "orange", "value": 30},
-              {"color": "green", "value": 70}
+              {"color": "red", "value": 70}
             ]
           }
         }
       }
     },
     {
-      "title": "🌐 활성 공격자 IP",
+      "title": "Unique Client IPs (1h)",
       "type": "stat",
       "gridPos": {"x": 9, "y": 0, "w": 3, "h": 3},
-      "targets": [{
-        "expr": "count(count_over_time({job=~\"f5_asm_syslog.*\"}[1h]) by (src_ip))",
-        "legendFormat": "고유 IP"
-      }],
+      "targets": [
+        {
+          "expr": "count(sum by (ip_client) (count_over_time({job=~\"f5_asm_syslog.*\"}[1h])))",
+          "legendFormat": "client IPs"
+        }
+      ],
       "options": {
         "colorMode": "background",
         "graphMode": "none",
-        "reduceOptions": {"calcs": ["lastNotNull"]}
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {"calcs": ["lastNotNull"]},
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "orange", "value": 50},
+              {"color": "red", "value": 200}
+            ]
+          }
+        }
       }
     },
     {
-      "title": "📊 공격 추세 (시간별)",
+      "title": "WAF Event Trend",
       "type": "timeseries",
       "gridPos": {"x": 0, "y": 3, "w": 12, "h": 8},
       "targets": [
         {
           "expr": "sum(count_over_time({job=~\"f5_asm_syslog.*\"}[5m]))",
-          "legendFormat": "전체 탐지"
+          "legendFormat": "total"
         },
         {
-          "expr": "sum(count_over_time({job=~\"f5_asm_syslog.*\"} |~ \"request_status=blocked\"[5m]))",
-          "legendFormat": "차단"
+          "expr": "sum(count_over_time({job=~\"f5_asm_syslog.*\",request_status=\"blocked\"}[5m]))",
+          "legendFormat": "blocked"
         },
         {
-          "expr": "sum(count_over_time({job=~\"f5_asm_syslog.*\"} |~ \"request_status=alarmed\"[5m]))",
-          "legendFormat": "탐지만 (Alarm)"
+          "expr": "sum(count_over_time({job=~\"f5_asm_syslog.*\",request_status=~\"alarmed|alerted\"}[5m]))",
+          "legendFormat": "alarmed"
         }
       ],
       "options": {
@@ -138,13 +177,15 @@
       }
     },
     {
-      "title": "🔝 Top 10 공격 유형",
+      "title": "Top 10 Violations (24h)",
       "type": "barchart",
       "gridPos": {"x": 0, "y": 11, "w": 6, "h": 8},
-      "targets": [{
-        "expr": "topk(10, sum(count_over_time({job=~\"f5_asm_syslog.*\"}[24h])) by (violation))",
-        "legendFormat": "{{ violation }}"
-      }],
+      "targets": [
+        {
+          "expr": "topk(10, sum by (violations) (count_over_time({job=~\"f5_asm_syslog.*\",violations!=\"\",violations!=\"N/A\"}[24h])))",
+          "legendFormat": "{{violations}}"
+        }
+      ],
       "options": {
         "orientation": "horizontal",
         "sort": "desc"
@@ -159,13 +200,15 @@
       }
     },
     {
-      "title": "🔝 Top 10 공격자 IP",
+      "title": "Top 10 Client IPs (24h)",
       "type": "barchart",
       "gridPos": {"x": 6, "y": 11, "w": 6, "h": 8},
-      "targets": [{
-        "expr": "topk(10, sum(count_over_time({job=~\"f5_asm_syslog.*\"}[24h])) by (src_ip))",
-        "legendFormat": "{{ src_ip }}"
-      }],
+      "targets": [
+        {
+          "expr": "topk(10, sum by (ip_client) (count_over_time({job=~\"f5_asm_syslog.*\",ip_client!=\"\"}[24h])))",
+          "legendFormat": "{{ip_client}}"
+        }
+      ],
       "options": {
         "orientation": "horizontal",
         "sort": "desc"
@@ -180,13 +223,61 @@
       }
     },
     {
-      "title": "📋 최근 탐지 로그",
+      "title": "Top 10 Attack Types (24h)",
+      "type": "barchart",
+      "gridPos": {"x": 0, "y": 19, "w": 6, "h": 8},
+      "targets": [
+        {
+          "expr": "topk(10, sum by (attack_type) (count_over_time({job=~\"f5_asm_syslog.*\",attack_type!=\"\",attack_type!=\"N/A\"}[24h])))",
+          "legendFormat": "{{attack_type}}"
+        }
+      ],
+      "options": {
+        "orientation": "horizontal",
+        "sort": "desc"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "stacking": {"mode": "none"}
+          }
+        }
+      }
+    },
+    {
+      "title": "Top 10 Signatures (24h)",
+      "type": "barchart",
+      "gridPos": {"x": 6, "y": 19, "w": 6, "h": 8},
+      "targets": [
+        {
+          "expr": "topk(10, sum by (sig_names) (count_over_time({job=~\"f5_asm_syslog.*\",sig_names!=\"\",sig_names!=\"N/A\"}[24h])))",
+          "legendFormat": "{{sig_names}}"
+        }
+      ],
+      "options": {
+        "orientation": "horizontal",
+        "sort": "desc"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "stacking": {"mode": "none"}
+          }
+        }
+      }
+    },
+    {
+      "title": "Recent WAF Logs",
       "type": "logs",
-      "gridPos": {"x": 0, "y": 19, "w": 12, "h": 10},
-      "targets": [{
-        "expr": "{job=~\"f5_asm_syslog.*\"} |= ``",
-        "legendFormat": ""
-      }],
+      "gridPos": {"x": 0, "y": 27, "w": 12, "h": 10},
+      "targets": [
+        {
+          "expr": "{job=~\"f5_asm_syslog.*\"}",
+          "legendFormat": ""
+        }
+      ],
       "options": {
         "showTime": true,
         "showLabels": true,
@@ -197,29 +288,28 @@
       }
     }
   ],
-  "refresh": "30s",
-  "time": {
-    "from": "now-1h",
-    "to": "now"
-  },
-  "timepicker": {
-    "refresh_intervals": ["10s", "30s", "1m", "5m", "15m", "30m"],
-    "time_options": ["5m", "15m", "1h", "6h", "24h", "7d", "30d"]
-  },
   "templating": {
     "list": [
       {
-        "name": "attack_type",
+        "name": "request_status",
         "type": "query",
-        "query": "label_values({job=~\"f5_asm_syslog.*\"}, violation)",
+        "query": "label_values({job=~\"f5_asm_syslog.*\"}, request_status)",
         "refresh": 2,
         "includeAll": true,
         "multi": true
       },
       {
-        "name": "src_ip",
+        "name": "ip_client",
         "type": "query",
-        "query": "label_values({job=~\"f5_asm_syslog.*\"}, src_ip)",
+        "query": "label_values({job=~\"f5_asm_syslog.*\"}, ip_client)",
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true
+      },
+      {
+        "name": "policy_name",
+        "type": "query",
+        "query": "label_values({job=~\"f5_asm_syslog.*\"}, policy_name)",
         "refresh": 2,
         "includeAll": true,
         "multi": true

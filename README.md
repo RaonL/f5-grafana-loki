@@ -189,7 +189,7 @@ docker compose logs promtail | tail -20
 ### 직접 테스트 로그 보내보기 (BIG-IP 없이도 가능)
 
 ```bash
-echo '<14>1 2024-01-01T12:00:00Z bigip asm - - [src_ip=192.168.1.100 violation=SQL_INJECTION request_status=blocked uri="/test?id=1"]' | nc -u localhost 1514
+echo "<14>1 $(date -u +%Y-%m-%dT%H:%M:%SZ) bigip asm - - attack_type=\"SQL Injection\",ip_client=\"192.168.1.100\",method=\"GET\",policy_name=\"/Common/test_policy\",request_status=\"blocked\",response_code=\"403\",sig_names=\"SQL Injection Attempt\",support_id=\"123456789\",uri=\"/test?id=1\",violations=\"VIOL_ATTACK_SIGNATURE\",violation_rating=\"5\"" | nc -u localhost 1514
 ```
 
 ---
