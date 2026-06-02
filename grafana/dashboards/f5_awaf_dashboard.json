@@ -22,6 +22,8 @@
       "targets": [
         {
           "expr": "sum(count_over_time({job=~\"f5_asm_syslog.*\"}[24h]))",
+          "instant": true,
+          "range": false,
           "legendFormat": "events"
         }
       ],
@@ -54,6 +56,8 @@
       "targets": [
         {
           "expr": "sum(count_over_time({job=~\"f5_asm_syslog.*\",request_status=\"blocked\"}[24h]))",
+          "instant": true,
+          "range": false,
           "legendFormat": "blocked"
         }
       ],
@@ -86,6 +90,8 @@
       "targets": [
         {
           "expr": "100 * sum(count_over_time({job=~\"f5_asm_syslog.*\",request_status=\"blocked\"}[24h])) / clamp_min(sum(count_over_time({job=~\"f5_asm_syslog.*\"}[24h])), 1)",
+          "instant": true,
+          "range": false,
           "legendFormat": "block rate"
         }
       ],
@@ -118,6 +124,8 @@
       "targets": [
         {
           "expr": "count(sum by (ip_client) (count_over_time({job=~\"f5_asm_syslog.*\"}[1h])))",
+          "instant": true,
+          "range": false,
           "legendFormat": "client IPs"
         }
       ],
@@ -183,6 +191,8 @@
       "targets": [
         {
           "expr": "topk(10, sum by (violations) (count_over_time({job=~\"f5_asm_syslog.*\",violations!=\"\",violations!=\"N/A\"}[24h])))",
+          "instant": true,
+          "range": false,
           "legendFormat": "{{violations}}"
         }
       ],
@@ -206,6 +216,8 @@
       "targets": [
         {
           "expr": "topk(10, sum by (ip_client) (count_over_time({job=~\"f5_asm_syslog.*\",ip_client!=\"\"}[24h])))",
+          "instant": true,
+          "range": false,
           "legendFormat": "{{ip_client}}"
         }
       ],
@@ -229,6 +241,8 @@
       "targets": [
         {
           "expr": "topk(10, sum by (attack_type) (count_over_time({job=~\"f5_asm_syslog.*\",attack_type!=\"\",attack_type!=\"N/A\"}[24h])))",
+          "instant": true,
+          "range": false,
           "legendFormat": "{{attack_type}}"
         }
       ],
@@ -252,6 +266,8 @@
       "targets": [
         {
           "expr": "topk(10, sum by (sig_names) (count_over_time({job=~\"f5_asm_syslog.*\",sig_names!=\"\",sig_names!=\"N/A\"}[24h])))",
+          "instant": true,
+          "range": false,
           "legendFormat": "{{sig_names}}"
         }
       ],
