@@ -35,6 +35,7 @@ services:
     hostname: promtail
     restart: unless-stopped
     ports:
+      - "9080:9080"           # Promtail 상태/메트릭
       - "1514:1514"           # TCP syslog 수신 (BIG-IP → Promtail)
       - "1514:1514/udp"       # UDP syslog 수신
     volumes:

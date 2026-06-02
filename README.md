@@ -181,6 +181,10 @@ tmsh save sys config
 # Promtail 로그 확인 (syslog 수신 여부)
 docker compose logs promtail | tail -20
 
+# Promtail 상태 및 syslog 수신 카운터 확인
+curl -s http://localhost:9080/ready
+curl -s http://localhost:9080/metrics | grep promtail_syslog_target_entries_total
+
 # Grafana 대시보드 열기
 # 브라우저 → http://localhost:3000
 # → "F5 AWAF - 실시간 WAF 모니터링" 대시보드
@@ -208,6 +212,10 @@ docker compose logs -f promtail
 
 # Loki에 저장된 로그 개수 확인
 curl -s "http://localhost:3100/loki/api/v1/query?query=count_over_time({job=~\"f5_asm_syslog.*\"}[1h])" | jq
+
+# Loki에 생성된 label 확인
+curl -s "http://localhost:3100/loki/api/v1/labels" | jq
+curl -s "http://localhost:3100/loki/api/v1/label/job/values" | jq
 
 # 모든 데이터 초기화
 docker compose down -v
