@@ -1,7 +1,7 @@
 {
   "title": "F5 AWAF - Real-time WAF Monitoring",
   "uid": "f5-awaf-dashboard",
-  "version": 3,
+  "version": 4,
   "timezone": "Asia/Seoul",
   "tags": ["F5", "AWAF", "WAF", "Security", "Loki"],
   "schemaVersion": 39,
@@ -16,7 +16,7 @@
   },
   "panels": [
     {
-      "title": "Total WAF Events (24h)",
+      "title": "Total F5 Syslog Events (24h)",
       "type": "stat",
       "gridPos": {"x": 0, "y": 0, "w": 3, "h": 3},
       "targets": [
@@ -24,7 +24,7 @@
           "expr": "sum(count_over_time({job=\"f5-awaf\"}[24h]))",
           "instant": true,
           "range": false,
-          "legendFormat": "events"
+          "legendFormat": "syslog events"
         }
       ],
       "options": {
@@ -50,15 +50,15 @@
       }
     },
     {
-      "title": "Blocked Events (24h)",
+      "title": "Total WAF Events (24h)",
       "type": "stat",
       "gridPos": {"x": 3, "y": 0, "w": 3, "h": 3},
       "targets": [
         {
-          "expr": "sum(count_over_time({job=\"f5-awaf\",request_status=\"blocked\"}[24h]))",
+          "expr": "sum(count_over_time({job=\"f5-awaf\",request_status!=\"\"}[24h]))",
           "instant": true,
           "range": false,
-          "legendFormat": "blocked"
+          "legendFormat": "waf events"
         }
       ],
       "options": {
@@ -123,7 +123,7 @@
       "gridPos": {"x": 9, "y": 0, "w": 3, "h": 3},
       "targets": [
         {
-          "expr": "count(sum by (ip_client) (count_over_time({job=\"f5-awaf\"}[1h])))",
+          "expr": "count(sum by (ip_client) (count_over_time({job=\"f5-awaf\",ip_client!=\"\"}[1h])))",
           "instant": true,
           "range": false,
           "legendFormat": "client IPs"
@@ -157,8 +157,8 @@
       "gridPos": {"x": 0, "y": 3, "w": 12, "h": 8},
       "targets": [
         {
-          "expr": "sum(count_over_time({job=\"f5-awaf\"}[5m]))",
-          "legendFormat": "total"
+          "expr": "sum(count_over_time({job=\"f5-awaf\",request_status!=\"\"}[5m]))",
+          "legendFormat": "waf total"
         },
         {
           "expr": "sum(count_over_time({job=\"f5-awaf\",request_status=\"blocked\"}[5m]))",
@@ -285,7 +285,7 @@
       }
     },
     {
-      "title": "Recent WAF Logs",
+      "title": "Recent F5 Syslog Logs",
       "type": "logs",
       "gridPos": {"x": 0, "y": 27, "w": 12, "h": 10},
       "targets": [
