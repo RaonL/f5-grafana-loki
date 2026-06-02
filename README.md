@@ -211,7 +211,7 @@ docker compose restart
 docker compose logs -f promtail
 
 # Loki에 저장된 로그 개수 확인
-curl -s "http://localhost:3100/loki/api/v1/query?query=count_over_time({job=~\"f5_asm_syslog.*\"}[1h])" | jq
+curl -s "http://localhost:3100/loki/api/v1/query?query=count_over_time({job=\"f5-awaf\"}[1h])" | jq
 
 # Loki에 생성된 label 확인
 curl -s "http://localhost:3100/loki/api/v1/labels" | jq

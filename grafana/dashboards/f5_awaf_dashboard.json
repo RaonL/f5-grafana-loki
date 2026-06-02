@@ -1,7 +1,7 @@
 {
   "title": "F5 AWAF - Real-time WAF Monitoring",
   "uid": "f5-awaf-dashboard",
-  "version": 2,
+  "version": 3,
   "timezone": "Asia/Seoul",
   "tags": ["F5", "AWAF", "WAF", "Security", "Loki"],
   "schemaVersion": 39,
@@ -21,7 +21,7 @@
       "gridPos": {"x": 0, "y": 0, "w": 3, "h": 3},
       "targets": [
         {
-          "expr": "sum(count_over_time({job=~\"f5_asm_syslog.*\"}[24h]))",
+          "expr": "sum(count_over_time({job=\"f5-awaf\"}[24h]))",
           "instant": true,
           "range": false,
           "legendFormat": "events"
@@ -55,7 +55,7 @@
       "gridPos": {"x": 3, "y": 0, "w": 3, "h": 3},
       "targets": [
         {
-          "expr": "sum(count_over_time({job=~\"f5_asm_syslog.*\",request_status=\"blocked\"}[24h]))",
+          "expr": "sum(count_over_time({job=\"f5-awaf\",request_status=\"blocked\"}[24h]))",
           "instant": true,
           "range": false,
           "legendFormat": "blocked"
@@ -89,7 +89,7 @@
       "gridPos": {"x": 6, "y": 0, "w": 3, "h": 3},
       "targets": [
         {
-          "expr": "100 * sum(count_over_time({job=~\"f5_asm_syslog.*\",request_status=\"blocked\"}[24h])) / clamp_min(sum(count_over_time({job=~\"f5_asm_syslog.*\"}[24h])), 1)",
+          "expr": "100 * sum(count_over_time({job=\"f5-awaf\",request_status=\"blocked\"}[24h])) / clamp_min(sum(count_over_time({job=\"f5-awaf\"}[24h])), 1)",
           "instant": true,
           "range": false,
           "legendFormat": "block rate"
@@ -123,7 +123,7 @@
       "gridPos": {"x": 9, "y": 0, "w": 3, "h": 3},
       "targets": [
         {
-          "expr": "count(sum by (ip_client) (count_over_time({job=~\"f5_asm_syslog.*\"}[1h])))",
+          "expr": "count(sum by (ip_client) (count_over_time({job=\"f5-awaf\"}[1h])))",
           "instant": true,
           "range": false,
           "legendFormat": "client IPs"
@@ -157,15 +157,15 @@
       "gridPos": {"x": 0, "y": 3, "w": 12, "h": 8},
       "targets": [
         {
-          "expr": "sum(count_over_time({job=~\"f5_asm_syslog.*\"}[5m]))",
+          "expr": "sum(count_over_time({job=\"f5-awaf\"}[5m]))",
           "legendFormat": "total"
         },
         {
-          "expr": "sum(count_over_time({job=~\"f5_asm_syslog.*\",request_status=\"blocked\"}[5m]))",
+          "expr": "sum(count_over_time({job=\"f5-awaf\",request_status=\"blocked\"}[5m]))",
           "legendFormat": "blocked"
         },
         {
-          "expr": "sum(count_over_time({job=~\"f5_asm_syslog.*\",request_status=~\"alarmed|alerted\"}[5m]))",
+          "expr": "sum(count_over_time({job=\"f5-awaf\",request_status=~\"alarmed|alerted\"}[5m]))",
           "legendFormat": "alarmed"
         }
       ],
@@ -190,7 +190,7 @@
       "gridPos": {"x": 0, "y": 11, "w": 6, "h": 8},
       "targets": [
         {
-          "expr": "topk(10, sum by (violations) (count_over_time({job=~\"f5_asm_syslog.*\",violations!=\"\",violations!=\"N/A\"}[24h])))",
+          "expr": "topk(10, sum by (violations) (count_over_time({job=\"f5-awaf\",violations!=\"\",violations!=\"N/A\"}[24h])))",
           "instant": true,
           "range": false,
           "legendFormat": "{{violations}}"
@@ -215,7 +215,7 @@
       "gridPos": {"x": 6, "y": 11, "w": 6, "h": 8},
       "targets": [
         {
-          "expr": "topk(10, sum by (ip_client) (count_over_time({job=~\"f5_asm_syslog.*\",ip_client!=\"\"}[24h])))",
+          "expr": "topk(10, sum by (ip_client) (count_over_time({job=\"f5-awaf\",ip_client!=\"\"}[24h])))",
           "instant": true,
           "range": false,
           "legendFormat": "{{ip_client}}"
@@ -240,7 +240,7 @@
       "gridPos": {"x": 0, "y": 19, "w": 6, "h": 8},
       "targets": [
         {
-          "expr": "topk(10, sum by (attack_type) (count_over_time({job=~\"f5_asm_syslog.*\",attack_type!=\"\",attack_type!=\"N/A\"}[24h])))",
+          "expr": "topk(10, sum by (attack_type) (count_over_time({job=\"f5-awaf\",attack_type!=\"\",attack_type!=\"N/A\"}[24h])))",
           "instant": true,
           "range": false,
           "legendFormat": "{{attack_type}}"
@@ -265,7 +265,7 @@
       "gridPos": {"x": 6, "y": 19, "w": 6, "h": 8},
       "targets": [
         {
-          "expr": "topk(10, sum by (sig_names) (count_over_time({job=~\"f5_asm_syslog.*\",sig_names!=\"\",sig_names!=\"N/A\"}[24h])))",
+          "expr": "topk(10, sum by (sig_names) (count_over_time({job=\"f5-awaf\",sig_names!=\"\",sig_names!=\"N/A\"}[24h])))",
           "instant": true,
           "range": false,
           "legendFormat": "{{sig_names}}"
@@ -290,7 +290,7 @@
       "gridPos": {"x": 0, "y": 27, "w": 12, "h": 10},
       "targets": [
         {
-          "expr": "{job=~\"f5_asm_syslog.*\"}",
+          "expr": "{job=\"f5-awaf\"}",
           "legendFormat": ""
         }
       ],
@@ -309,7 +309,7 @@
       {
         "name": "request_status",
         "type": "query",
-        "query": "label_values({job=~\"f5_asm_syslog.*\"}, request_status)",
+        "query": "label_values({job=\"f5-awaf\"}, request_status)",
         "refresh": 2,
         "includeAll": true,
         "multi": true
@@ -317,7 +317,7 @@
       {
         "name": "ip_client",
         "type": "query",
-        "query": "label_values({job=~\"f5_asm_syslog.*\"}, ip_client)",
+        "query": "label_values({job=\"f5-awaf\"}, ip_client)",
         "refresh": 2,
         "includeAll": true,
         "multi": true
@@ -325,7 +325,7 @@
       {
         "name": "policy_name",
         "type": "query",
-        "query": "label_values({job=~\"f5_asm_syslog.*\"}, policy_name)",
+        "query": "label_values({job=\"f5-awaf\"}, policy_name)",
         "refresh": 2,
         "includeAll": true,
         "multi": true
