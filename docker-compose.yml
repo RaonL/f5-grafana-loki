@@ -14,7 +14,7 @@ version: "3.9"
 services:
   # --- Loki: 로그 저장/검색 엔진 ---
   loki:
-    image: grafana/loki:3.7.2
+    image: grafana/loki:3.6.11
     container_name: f5-loki
     hostname: loki
     restart: unless-stopped
@@ -30,7 +30,7 @@ services:
 
   # --- Promtail: 로그 수집기 (BIG-IP syslog 수신) ---
   promtail:
-    image: grafana/promtail:3.7.2
+    image: grafana/promtail:3.6.11
     container_name: f5-promtail
     hostname: promtail
     restart: unless-stopped
