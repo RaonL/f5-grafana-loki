@@ -17,6 +17,7 @@ scrape_configs:
     syslog:
       listen_address: 0.0.0.0:1514
       listen_protocol: udp
+      syslog_format: rfc3164
       idle_timeout: 60s
       label_structured_data: true
       use_incoming_timestamp: false
@@ -66,6 +67,7 @@ scrape_configs:
     syslog:
       listen_address: 0.0.0.0:1514
       listen_protocol: tcp
+      syslog_format: rfc3164
       idle_timeout: 60s
       label_structured_data: true
       use_incoming_timestamp: false

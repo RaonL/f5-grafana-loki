@@ -229,6 +229,7 @@ docker compose down -v
 |------|------|------|
 | Grafana 3000 접속 안 됨 | Docker 미실행 | `docker compose up -d` 실행 |
 | Promtail 로그 없음 | BIG-IP syslog 미도달 | ① Windows 방화벽 확인 ② `netsh portproxy` 확인 ③ BIG-IP syslog 설정 확인 |
+| `expecting a version value in the range 1-999` | Promtail이 RFC5424로 파싱하지만 BIG-IP가 RFC3164 syslog를 전송 | `promtail-config.yml`의 `syslog_format: rfc3164` 확인 후 `docker compose restart promtail` |
 | Loki 연결 오류 | Loki 컨테이너 미실행 | `docker compose logs loki` 확인 |
 | 대시보드 안 보임 | 프로비저닝 실패 | `docker compose restart grafana` |
 | WSL2 IP 변경됨 | WSL2 재시작 | `netsh interface portproxy` 재설정 |
